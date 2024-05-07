@@ -25,7 +25,7 @@ public class PostFormPage {
 	private WebElement wePostTitle;
 	@FindBy(name="description")
 	private WebElement wePostDescription;
-	@FindBy(xpath = "//name='tag_id[]'")
+	@FindBy(xpath = "//*[@class='form-check-input']")
 	private WebElement wePostTags;
 	@FindBy(xpath = "//iframe[@class='cke_wysiwyg_frame cke_reset']")
 	private WebElement wePostContent;
@@ -35,6 +35,14 @@ public class PostFormPage {
 	private WebElement weButtonCancel;
 	@FindBy(xpath = "//i[@class='far fa-user']")
 	private WebElement weButtonProfile;
+	@FindBy(id = "title-error")
+	private WebElement weErrorTitle;
+	@FindBy(id = "description-error")
+	private WebElement weErrorDescription;
+	@FindBy(id = "tag_id[]-error")
+	private WebElement weErrorTags;
+	@FindBy(xpath = "//*[@class='invalid-feedback']")
+	private WebElement weErrorContent;
 	
 	
 	public PostFormPage(WebDriver driver,WebDriverWait driverWait) {
@@ -45,6 +53,23 @@ public class PostFormPage {
 		this.driver.manage().window().maximize();
 		PageFactory.initElements(driver, this);
 	}	
+	
+	public void openPage() {
+		driver.get(PAGE_URL);
+	}
+	
+	public void clickSave() throws InterruptedException {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonSave);
+		Thread.sleep(2000);
+		weButtonSave.click();
+	}
+	public void clickCancel() throws InterruptedException {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonCancel);
+		Thread.sleep(1000);
+		weButtonCancel.click();
+	}
+	
+	
 	
 	public void addNewPost(String postTitle) {
 		wePostTitle.sendKeys(postTitle);
@@ -96,28 +121,27 @@ public class PostFormPage {
 		wePostDescription.sendKeys(postDescription);
 	}
 	public String inputTagsString(String postTags) {
-		wePostTags.clear();
-		//wePostTags.sendKeys(postTags);
+		wePostTags.sendKeys(postTags);
+	
 		wePostTags.click();
 		return postTags;
 	}
 	public void inputContentString(String postContent) throws InterruptedException {
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", wePostContent);
 		Thread.sleep(1000);
-	//	wePostContent.clear();
+	
+		wePostContent.sendKeys(postContent);
+		driver.switchTo().frame(wePostContent);
+
+		WebElement iframeElement = driver.findElement(By.tagName("p"));
+
+		iframeElement.sendKeys("");
+
+		driver.switchTo().defaultContent();
 		wePostContent.sendKeys(postContent);
 	}
 	
-	public void clickSave() throws InterruptedException {
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonSave);
-		Thread.sleep(2000);
-		weButtonSave.click();
-	}
-	public void clickCancel() throws InterruptedException {
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonCancel);
-		Thread.sleep(1000);
-		weButtonCancel.click();
-	}
+
 	public void clickProfile() {
 		weButtonProfile.click();
 	}
@@ -131,9 +155,18 @@ public class PostFormPage {
 		WebElement we = driver.findElement(By.xpath("//*[@class='error invalid-feedback']"));
 		return we.getText();
 	}
-	
-	public void openPage() {
-		driver.get(PAGE_URL);
+	public String getTitleInputErrorMessage() {
+		return weErrorTitle.getText();
+		
+	}
+	public String getDescriptionInputErrorMessage() {
+		return weErrorDescription.getText();
+	}
+	public String getTagsInputErrorMessage() {
+		return weErrorTags.getText();
+	}
+	public String getContentInputErrorMessage() {
+		return weErrorContent.getText();
 	}
 	
 

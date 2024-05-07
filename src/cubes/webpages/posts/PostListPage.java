@@ -1,5 +1,7 @@
 package cubes.webpages.posts;
 
+import java.util.ArrayList;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,8 +22,11 @@ public class PostListPage {
 	private WebElement weDialogCancel;
 	@FindBy(xpath = "//button[@text = 'Delete']")
 	private WebElement weDialogDelete;
+	@FindBy(xpath = "//button[@text = 'rvtqaxkilbnwtmxcxyvyye']")
 	private WebElement weDialogUnimportant;
-	private WebElement weDialogUpdate;
+	
+	//@FindBy(xpath = "//button[@text = '']")
+	private WebElement weDialogEdit;
 
 	
 	public PostListPage(WebDriver driver, WebDriverWait wait) {
@@ -32,8 +37,34 @@ public class PostListPage {
 		PageFactory.initElements(driver, this);
 	}
 	
+	public void openPage() {
+		driver.get(PAGE_URL);
+	}
+	public void openLinkParentInMenu(String title) {
+		WebElement weMenu = driver.findElement(By.xpath("//p[text()='"+title+"']//ancestor::li[2]"));
+		
+		if(!weMenu.getAttribute("class").toString().equalsIgnoreCase("nav-item has-treeview menu-open")) {
+			weMenu.click();
+		}
+	}
+	public void clickOnLinkInMenu(String title) {
+		WebElement weLink = driver.findElement(By.xpath("//p[text()='"+title+"']"));
+		driverWait.until(ExpectedConditions.visibilityOf(weLink));
+		weLink.click();
+	}
+	public void clickOnNavigationLink(String title) {
+		WebElement weLink = driver.findElement(By.xpath("//a[text()='"+title+"']"));
+		weLink.click();
+	}
+	public void clickOnAddNewPost() {
+		weAddNewPost.click();
+	}
+	
+	
+	
+	
 	public void deletePost(String postTitle) {
-		WebElement weDeleteButton = driver.findElement(By.xpath("//strong[text()='"+postTitle+"']//ancestor::tr//td[10]//button"));
+		WebElement weDeleteButton = driver.findElement(By.xpath("//strong[text()='"+postTitle+"']//ancestor::tr//td[12]//button[1]"));
 		weDeleteButton.click();
 		
 		driverWait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//i[@class='fas fa-trash']"))));
@@ -53,28 +84,16 @@ public class PostListPage {
 		return !driver.findElements(By.xpath("//strong[text()='"+postTitle+"']")).isEmpty();
 	}
 	
-	public void openPage() {
-		driver.get(PAGE_URL);
-	}
-	
-	public void clickOnAddNewPost() {
-		weAddNewPost.click();
-	}
 	public void clickOnDeletePost(String postTitle) {
 		WebElement weDeleteButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"));
+		driverWait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"))));
+		
+		driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button")).click();
 		weDeleteButton.click();
 	}
-	public void clickOnDisablePost(String postTitle) {
-		WebElement weDisableButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"));
-		weDisableButton.click();
-	}
-	public void clickOnUnimportantPost(String postTitle) {
-		WebElement weUnimportantButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button[2]"));
-		weUnimportantButton.click();
-	}
-	public void clickOnUpdatePost(String postTitle) {
-		WebElement weUpdateButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button[2]"));
-		weUpdateButton.click();
+	public void clickOnEditPost(String postTitle) {
+		WebElement weEditPost = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//i"));
+		weEditPost.click();
 	}
 	public void clickOnDialogCancel() {
 		driverWait.until(ExpectedConditions.visibilityOf(weDialogCancel));
@@ -84,14 +103,29 @@ public class PostListPage {
 		driverWait.until(ExpectedConditions.visibilityOf(weDialogDelete));
 		weDialogDelete.click();
 	}
+	public void clickOnDisablePost(String postTitle) {
+		WebElement weDisableButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"));
+		weDisableButton.click();
+	}
+	public void clickOnUnimportantPost(String postTitle) {
+		WebElement weUnimportantButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button[2]"));
+		weUnimportantButton.click();
+	}
 	public void clickOnDialogUnimportant() {
 		driverWait.until(ExpectedConditions.visibilityOf(weDialogUnimportant));
 		weDialogUnimportant.click();
 	}
-	public void clickOnDialogUpdate() {
-		driverWait.until(ExpectedConditions.visibilityOf(weDialogUpdate));
-		weDialogUpdate.click();
+	public void clickOnDialogEdit() {
+		driverWait.until(ExpectedConditions.visibilityOf(weDialogEdit));
+		weDialogEdit.click();
 	}
+	public boolean isPostInList1(String postTitle) {
+		
+		ArrayList<WebElement> wePosts = (ArrayList<WebElement>) driver.findElements(By.xpath("//td[text()='"+postTitle+"']"));
+	
+		return !wePosts.isEmpty();
+	}
+	
 
 
 }
