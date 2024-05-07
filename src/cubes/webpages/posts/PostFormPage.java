@@ -26,7 +26,7 @@ public class PostFormPage {
 	private WebElement wePostTitle;
 	@FindBy(name="description")
 	private WebElement wePostDescription;
-	@FindBy(css = "//input[@name='tag_id[]']")
+	@FindBy(xpath = "//input[@name='tag_id[]']")
 	private List<WebElement> wePostTags;
 	@FindBy(xpath = "//iframe[@class='cke_wysiwyg_frame cke_reset']")
 	private WebElement wePostContent;
@@ -74,11 +74,12 @@ public class PostFormPage {
 		wePostTitle.sendKeys(postTitle);
 		weButtonSave.click();
 	}
+
 	public String addNewRandomPost() {
 		Random random = new Random();
-		String postTitle = "Post "+random.nextInt(100);
+		String postTitle = Constants.postTitle + random.nextInt(100);
 		wePostTitle.sendKeys(postTitle);
-		weButtonSave.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", weButtonSave);
 		return postTitle;
 	}
 	
@@ -108,7 +109,7 @@ public class PostFormPage {
 
 	}
 	
-	public void inputPostString(String postTitle) {
+	public void inputPostTitleString(String postTitle) {
 		wePostTitle.clear();
 		wePostTitle.sendKeys(postTitle);
 	}

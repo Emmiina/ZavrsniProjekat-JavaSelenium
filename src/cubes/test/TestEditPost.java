@@ -2,27 +2,19 @@ package cubes.test;
 
 import static org.testng.Assert.assertEquals;
 
-import java.time.Duration;
 import java.util.Random;
 
 import cubes.constants.Constants;
 import cubes.main.TestBase;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import cubes.webpages.LoginPage;
 import cubes.webpages.posts.PostFormPage;
 import cubes.webpages.posts.PostListPage;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestUpdatePost extends TestBase {
+public class TestEditPost extends TestBase {
 
 	PostFormPage postFormPage = new PostFormPage(TestBase.driver, TestBase.wait);
 	PostListPage postListPage = new PostListPage(TestBase.driver, TestBase.wait);
