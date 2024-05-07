@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.time.Duration;
 
+import cubes.main.TestBase;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,42 +20,13 @@ import cubes.webpages.posts.PostFormPage;
 import cubes.webpages.posts.PostListPage;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestDeletePost {
+public class TestDeletePost extends TestBase {
 	
 	private static ChromeDriver driver;
-	private static LoginPage loginPage;
 	private static PostFormPage postFormPage;
 	private static PostListPage postListPage;
 	
 	private static String postTitle;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/emina/Downloads/webDriver/chromedriver.exe");
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
-		WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofMillis(10000));
-		
-		loginPage = new LoginPage(driver);
-		postFormPage = new PostFormPage(driver, driverWait);
-		postListPage = new PostListPage(driver, driverWait);
-		
-		loginPage.loginSuccess();
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		driver.close();
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		postListPage.openPage();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void tc1TestCancelOnDelete() {

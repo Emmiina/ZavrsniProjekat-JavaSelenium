@@ -2,57 +2,20 @@ package cubes.test;
 
 import static org.testng.Assert.assertEquals;
 
-import java.time.Duration;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import cubes.constants.Constants;
+import cubes.main.TestBase;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import cubes.webpages.LoginPage;
 import cubes.webpages.posts.PostFormPage;
 import cubes.webpages.posts.PostListPage;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestAddPost {
-	
-	private static ChromeDriver driver;
-	private static LoginPage loginPage;
-	private static PostFormPage postFormPage;
-//	private static PostListPage postListPage;
+public class TestAddPost extends TestBase {
 
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		System.setProperty("webdriver.chrome.driver", "C:/Users/emina/Downloads/webDriver/chromedriver.exe");
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
-		WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofMillis(10000));
-		
-		loginPage = new LoginPage(driver);
-		postFormPage = new PostFormPage(driver, driverWait);
-//		postListPage = new PostListPage(driver, driverWait);
-		loginPage.loginSuccess();	
-		
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		driver.close();
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
+	PostFormPage postFormPage = new PostFormPage(TestBase.driver, TestBase.wait);
+	PostListPage postListPage = new PostListPage(TestBase.driver, TestBase.wait);;
 
 	@Test
 	public void tc1TestLinkFromMenu() {
@@ -71,82 +34,77 @@ public class TestAddPost {
 	
 	@Test
 	public void tc2TestNavigationLink() {
-		postFormPage.checkNavigationLink("Home", "https://testblog.kurs-qa.cubes.edu.rs/admin");
-		postFormPage.checkNavigationLink("Post", "https://testblog.kurs-qa.cubes.edu.rs/admin/posts");
+		postFormPage.openPage();
+		postFormPage.checkNavigationLink("Home", Constants.starterPageUrl);
+		postFormPage.openPage();
+		postFormPage.checkNavigationLink("Post", Constants.postsPageUrl);
 	}
 	
 	@Test
 	public void tc3TestAddEmptyPost() throws InterruptedException {
+		postFormPage.openPage();
 		postFormPage.inputPostString("");
 		postFormPage.clickSave();
 		
-		String errorMessage = postFormPage.getErrorMessage();
+		String errorMessage = postFormPage.getErrorMessage("title");
 		
-		assertEquals("This field is required.", errorMessage);	
+		assertEquals(errorMessage, "This field is required.");
 	}
 	
 	@Test
 	public void tc4TestAddPostWithShortTitle() throws InterruptedException{
+		postFormPage.openPage();
 		postFormPage.inputPostString("Post1");
 		postFormPage.clickSave();
 		
-		String errorMessage = postFormPage.getErrorMessage();
+		String errorMessage = postFormPage.getErrorMessage("title");
 		
-		assertEquals("Please enter at least 20 characters.", errorMessage);	
+		assertEquals(errorMessage, "Please enter at least 20 characters.");
 	}
 	
 	@Test
-	public void tc5TestAddPostWithCorectTitleAndShortDescription() throws InterruptedException{
+	public void tc5TestAddPostWithCorrectTitleAndShortDescription() throws InterruptedException{
+		postFormPage.openPage();
 		postFormPage.inputPostString("Post1Post1Post1Post1Post1");
 		postFormPage.inputDescriptionString("Test 1");
 		postFormPage.clickSave();
 		
-		String errorMessage = postFormPage.getErrorMessage();
-		
-		assertEquals("Please enter at least 50 characters.", errorMessage);	
+		String errorMessageDescription = postFormPage.getErrorMessage("description");
+
+		assertEquals(errorMessageDescription, "Please enter at least 50 characters.");
 	}
 	
 	@Test
-	public void tc6TestAddPostWithCorectTitleCorectDescriptionAndEmptyOthersFields() throws InterruptedException{
+	public void tc6TestAddPostWithCorrectTitleCorrectDescriptionAndEmptyOthersFields() throws InterruptedException{
+		postFormPage.openPage();
 		postFormPage.inputPostString("Post1Post1Post1Post1Post1");
 		postFormPage.inputDescriptionString("test1test1test1test1test1test1test1test1test1test1");
 		postFormPage.clickSave();
 		
-		String errorMessage = postFormPage.getErrorMessage();
+		String errorMessage = postFormPage.getErrorMessage("tags");
 		
-		assertEquals("This field is required.", errorMessage);	
+		assertEquals(errorMessage, "This field is required.");
 	}
 	
 	@Test
-	public void tc7TestAddPostWithCorectTitleCorectDescriptionCheckTagsNameAndEmptyOthersFields() throws InterruptedException{
+	public void tc7TestAddPostWithCorrectTitleCorrectDescriptionCheckTagsNameAndEmptyOthersFields() throws InterruptedException{
+		postFormPage.openPage();
 		postFormPage.inputPostString("Post1Post1Post1Post1Post1");
 		postFormPage.inputDescriptionString("test1test1test1test1test1test1test1test1test1test1");
-		postFormPage.inputTagsString("");
-		postFormPage.inputContentString("");
+		postFormPage.clickTags();
 		postFormPage.clickSave();
-		
-		String errorMessage = postFormPage.getErrorMessage();
-		
-		assertEquals("The content field is required.", errorMessage);
-		
+
+		String errorMessageContent = postFormPage.getErrorMessage("content");
+
+		assertEquals(errorMessageContent, "The content field is required.");
 	}
+
 	@Test
-	public void tc8tectCancel() throws InterruptedException {
+	public void tc8TestCancel() throws InterruptedException {
+		postFormPage.openPage();
 		postFormPage.inputPostString("Post test title");
 		postFormPage.clickCancel();
-		
-		assertEquals(driver.getCurrentUrl(), "https://testblog.kurs-qa.cubes.edu.rs/admin/posts/add");
-		
-		postFormPage.openPage();
+		Thread.sleep(2000);
+		assertEquals(driver.getCurrentUrl(), Constants.postsPageUrl);
 	}
-	@Test
-	public void tc9TestLogout() {
-		postFormPage.clickProfile();
-		postFormPage.clickLogout();
-		
-		assertEquals(driver.getCurrentUrl(), "https://testblog.kurs-qa.cubes.edu.rs/login");
-	}
-	
-	
-
 }

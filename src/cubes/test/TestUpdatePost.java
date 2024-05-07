@@ -77,7 +77,7 @@ public class TestUpdatePost {
 	public void tc2TestUpdatePostWithExistingTitle() throws InterruptedException {
 		postListPage.clickOnUpdatePost(postTitle);
 		
-		postFormPage.inputTagsString("zvejtidkjauiepmuljnspkbo");
+		postFormPage.inputTags("zvejtidkjauiepmuljnspkbo");
 		
 		postFormPage.clickSave();
 		
