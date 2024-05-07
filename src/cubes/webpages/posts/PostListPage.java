@@ -2,7 +2,9 @@ package cubes.webpages.posts;
 
 import java.util.ArrayList;
 
+import cubes.constants.Constants;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -12,9 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class PostListPage {
 	
-	private WebDriver driver;
-	private WebDriverWait driverWait;
-	private static final String PAGE_URL="https://testblog.kurs-qa.cubes.edu.rs/admin/posts";
+	private final WebDriver driver;
+	private final WebDriverWait driverWait;
 	
 	@FindBy(xpath = "//a[@class='btn btn-success']")
 	private WebElement weAddNewPost;
@@ -32,18 +33,18 @@ public class PostListPage {
 	public PostListPage(WebDriver driver, WebDriverWait wait) {
 		this.driver = driver;
 		this.driverWait = wait;
-		this.driver.get(PAGE_URL);
+		this.driver.get(Constants.postsPageUrl);
 		this.driver.manage().window().maximize();
 		PageFactory.initElements(driver, this);
 	}
 	
 	public void openPage() {
-		driver.get(PAGE_URL);
+		driver.get(Constants.postsPageUrl);
 	}
 	public void openLinkParentInMenu(String title) {
 		WebElement weMenu = driver.findElement(By.xpath("//p[text()='"+title+"']//ancestor::li[2]"));
 		
-		if(!weMenu.getAttribute("class").toString().equalsIgnoreCase("nav-item has-treeview menu-open")) {
+		if(!weMenu.getAttribute("class").equalsIgnoreCase("nav-item has-treeview menu-open")) {
 			weMenu.click();
 		}
 	}
@@ -59,9 +60,6 @@ public class PostListPage {
 	public void clickOnAddNewPost() {
 		weAddNewPost.click();
 	}
-	
-	
-	
 	
 	public void deletePost(String postTitle) {
 		WebElement weDeleteButton = driver.findElement(By.xpath("//strong[text()='"+postTitle+"']//ancestor::tr//td[12]//button[1]"));
@@ -85,14 +83,12 @@ public class PostListPage {
 	}
 	
 	public void clickOnDeletePost(String postTitle) {
-		WebElement weDeleteButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"));
-		driverWait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"))));
-		
-		driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button")).click();
-		weDeleteButton.click();
+		WebElement weDeleteButton = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//i[@class='fas fa-trash']"));
+		//driverWait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//button"))));
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", weDeleteButton);
 	}
 	public void clickOnEditPost(String postTitle) {
-		WebElement weEditPost = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//i"));
+		WebElement weEditPost = driver.findElement(By.xpath("//td[text()='"+postTitle+"']//ancestor::tr//td[12]//i[@class='fas fa-edit']"));
 		weEditPost.click();
 	}
 	public void clickOnDialogCancel() {
@@ -125,7 +121,4 @@ public class PostListPage {
 	
 		return !wePosts.isEmpty();
 	}
-	
-
-
 }

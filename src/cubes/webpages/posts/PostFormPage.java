@@ -1,12 +1,11 @@
 package cubes.webpages.posts;
 
-
-import static cubes.main.TestBase.driver;
 import static org.testng.Assert.assertEquals;
 
 import java.util.List;
 import java.util.Random;
 
+import cubes.constants.Constants;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -21,13 +20,13 @@ public class PostFormPage {
 	
 	private final WebDriver driver;
 	private final WebDriverWait driverWait;
-	private static final String PAGE_URL="https://testblog.kurs-qa.cubes.edu.rs/admin/posts/add";
+
 	//WebElements
 	@FindBy(name="title")
 	private WebElement wePostTitle;
 	@FindBy(name="description")
 	private WebElement wePostDescription;
-	@FindBy(css = "input[name='tag_id[]']")
+	@FindBy(xpath = "//input[@name='tag_id[]']")
 	private List<WebElement> wePostTags;
 	@FindBy(xpath = "//iframe[@class='cke_wysiwyg_frame cke_reset']")
 	private WebElement wePostContent;
@@ -37,6 +36,14 @@ public class PostFormPage {
 	private WebElement weButtonCancel;
 	@FindBy(xpath = "//i[@class='far fa-user']")
 	private WebElement weButtonProfile;
+	@FindBy(id = "title-error")
+	private WebElement weErrorTitle;
+	@FindBy(id = "description-error")
+	private WebElement weErrorDescription;
+	@FindBy(id = "tag_id[]-error")
+	private WebElement weErrorTags;
+	@FindBy(xpath = "//*[@class='invalid-feedback']")
+	private WebElement weErrorContent;
 
 	//Error messages
 	@FindBy(id="title-error")
@@ -53,25 +60,26 @@ public class PostFormPage {
 	public PostFormPage(WebDriver driver,WebDriverWait driverWait) {
 		this.driver = driver;
 		this.driverWait = driverWait;
-
-		this.driver.get(PAGE_URL);
+		
+		this.driver.get(Constants.addPostPageUrl);
 		this.driver.manage().window().maximize();
 		PageFactory.initElements(driver, this);
 	}
 
 	public void openPage() {
-		driver.get(PAGE_URL);
+		driver.get(Constants.addPostPageUrl);
 	}
 	
 	public void addNewPost(String postTitle) {
 		wePostTitle.sendKeys(postTitle);
 		weButtonSave.click();
 	}
+
 	public String addNewRandomPost() {
 		Random random = new Random();
-		String postTitle = "Post "+random.nextInt(100);
+		String postTitle = Constants.postTitle + random.nextInt(100);
 		wePostTitle.sendKeys(postTitle);
-		weButtonSave.click();
+		((JavascriptExecutor) driver).executeScript("arguments[0].click()", weButtonSave);
 		return postTitle;
 	}
 	
@@ -87,6 +95,8 @@ public class PostFormPage {
 		weLink.click();
 		
 		assertEquals(driver.getCurrentUrl(), url,"Bad url for "+title);
+		
+		driver.get(Constants.addPostPageUrl);
 	}
 	
 	public void checkNavigationLink(String title, String url) {
@@ -94,9 +104,12 @@ public class PostFormPage {
 		weLink.click();
 		
 		assertEquals(driver.getCurrentUrl(), url,"Bad url for "+title);
+		
+		driver.get(Constants.addPostPageUrl);
+
 	}
 	
-	public void inputPostString(String postTitle) {
+	public void inputPostTitleString(String postTitle) {
 		wePostTitle.clear();
 		wePostTitle.sendKeys(postTitle);
 	}
@@ -110,10 +123,16 @@ public class PostFormPage {
 		wePostDescription.sendKeys(postDescription);
 	}
 
-	public void inputTags(String text){
+	public void inputTags(String text) throws InterruptedException {
 		for (WebElement postTag : wePostTags) {
 			postTag.sendKeys(text);
 		}
+	}
+
+	public void clickTagString (String postTag) {
+		WebElement weTestTag = driver.findElement(By.xpath("//label[@class='form-check-label'] " +
+				"[contains(text(),'"+ postTag +"')]/preceding-sibling::input[@name='tag_id[]']"));
+		weTestTag.click();
 	}
 
 	public void clickTags(){
@@ -125,10 +144,18 @@ public class PostFormPage {
 	public void inputContentString(String postContent) throws InterruptedException {
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", wePostContent);
 		Thread.sleep(1000);
-	//	wePostContent.clear();
+
+		wePostContent.sendKeys(postContent);
+		driver.switchTo().frame(wePostContent);
+
+		WebElement iframeElement = driver.findElement(By.tagName("p"));
+
+		iframeElement.sendKeys("");
+
+		driver.switchTo().defaultContent();
 		wePostContent.sendKeys(postContent);
 	}
-	
+
 	public void clickSave() throws InterruptedException {
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonSave);
 		Thread.sleep(2000);
@@ -136,21 +163,10 @@ public class PostFormPage {
 	}
 
 	public void clickCancel() throws InterruptedException {
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonCancel);
-		Thread.sleep(1000);
-		((JavascriptExecutor) driver).executeScript("arguments[0].click()", weButtonCancel);
-	}
-
-	public void clickProfile() {
-		weButtonProfile.click();
-	}
-
-	public void clickLogout() {
-		WebElement weLogout = driver.findElement(By.xpath("//i[@class='fas fa-sign-out-alt']"));
-		driverWait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//i[@class='fas fa-sign-out-alt']"))));
-		driver.findElement(By.xpath("//i[@class='fas fa-sign-out-alt']")).click();
-		
-	}
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true)", weButtonCancel);
+			Thread.sleep(1000);
+			((JavascriptExecutor) driver).executeScript("arguments[0].click()", weButtonCancel);
+		}
 
 	public String getErrorMessage(String field) {
 		WebElement we = switch (field) {
@@ -161,5 +177,19 @@ public class PostFormPage {
             default -> throw new IllegalStateException("Unexpected value: " + field);
         };
         return we.getText();
+	}
+
+	public String getTitleInputErrorMessage() {
+		return weErrorTitle.getText();
+
+	}
+	public String getDescriptionInputErrorMessage() {
+		return weErrorDescription.getText();
+	}
+	public String getTagsInputErrorMessage() {
+		return weErrorTags.getText();
+	}
+	public String getContentInputErrorMessage() {
+		return weErrorContent.getText();
 	}
 }
