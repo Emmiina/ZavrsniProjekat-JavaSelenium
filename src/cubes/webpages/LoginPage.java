@@ -1,5 +1,6 @@
 package cubes.webpages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -16,6 +17,8 @@ public class LoginPage {
 	private WebElement wePassword;
 	@FindBy(xpath = "//button[@type='submit']")
 	private WebElement weButton;
+	@FindBy(css = ".content-header h1")
+	private WebElement weStarterPage;
 	
 	public LoginPage(WebDriver driver) {
 		this.driver = driver;
@@ -23,17 +26,19 @@ public class LoginPage {
 		this.driver.manage().window().maximize();
 		PageFactory.initElements(driver, this);
 	}
-	
-	public void loginSuccess() {
-		weEmail.sendKeys("kursqa@cubes.edu.rs");
-		wePassword.sendKeys("cubesqa");
-		weButton.click();
-	}
-	
+
 	public void login(String email, String password) {
 		weEmail.sendKeys(email);
 		wePassword.sendKeys(password);
 		weButton.click();
 	}
 	
+	public void loginSuccess() {
+		if (weStarterPage.isDisplayed()) {
+			System.out.println("Uspesno ste se ulogovali!");
+		}
+		else {
+			System.out.println("Niste se ulogovali. proverite email i password!");
+		}
+	}
 }
