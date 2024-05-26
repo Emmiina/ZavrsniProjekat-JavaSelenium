@@ -29,6 +29,10 @@ public class PostFormPage {
 	private WebElement wePostDescription;
 	@FindBy(xpath = "//input[@name='tag_id[]']")
 	private List<WebElement> wePostTags;
+	@FindBy(xpath = "//label[@for='set-as-important']")
+	private WebElement weImportantRadioButton;
+	@FindBy(xpath = "//label[@for='set-as-unimportant']")
+	private WebElement weUnimportantRadioButton;
 	@FindBy(xpath = "//iframe[@class='cke_wysiwyg_frame cke_reset']")
 	private WebElement wePostContent;
 	@FindBy(xpath = "//button[@type='submit']")
@@ -119,6 +123,14 @@ public class PostFormPage {
 	public void inputDescriptionString(String postDescription) {
 		wePostDescription.clear();
 		wePostDescription.sendKeys(postDescription);
+	}
+
+	public void inputImportantStatus(String status){
+		if (status.equals("important")){
+			weImportantRadioButton.click();
+		}else {
+			weUnimportantRadioButton.click();
+		}
 	}
 
 	public void inputTags(String text) throws InterruptedException {

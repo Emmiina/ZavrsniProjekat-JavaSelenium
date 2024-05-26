@@ -67,11 +67,13 @@ public class TestUnimportantPost extends TestBase {
 
 		postListPage.clickOnSortingButton();
 		Thread.sleep(2000);
-		postListPage.clickOnImportantActionButton(postTitle, Constants.importantPost);
+		postListPage.clickOnEditActionButton(postTitle);
+		postFormPage.inputImportantStatus(Constants.importantPost);
+		postFormPage.clickSave();
+		postListPage.checkSuccessMessage();
 
-		postListPage.clickOnDialogImportantButton();
-		Thread.sleep(2000);
-
+		postListPage.clickOnSortingButton();
+		Thread.sleep(1000);
 		postListPage.clickOnImportantActionButton(postTitle, Constants.unimportantPost);
 
 		postListPage.clickOnDialogUnimportantButton();
