@@ -21,7 +21,6 @@ public class PostFormPage {
 	
 	private final WebDriver driver;
 	private final WebDriverWait driverWait;
-	public final HashMap<String, WebElement> errorMessages = new HashMap<>();
 
 	//WebElements
 	@FindBy(name="title")
@@ -50,22 +49,19 @@ public class PostFormPage {
 	public PostFormPage(WebDriver driver,WebDriverWait driverWait) {
 		this.driver = driver;
 		this.driverWait = driverWait;
-		
 		this.driver.get(Constants.addPostPageUrl);
 		this.driver.manage().window().maximize();
-		setErrorMessages();
 		PageFactory.initElements(driver, this);
 	}
 
-	public void setErrorMessages() {
-		errorMessages.put("title",  weErrorTitle);
-		errorMessages.put("description",  weErrorDescription);
-		errorMessages.put("tags",  weErrorTags);
-		errorMessages.put("content",  weErrorContent);
-	}
-
-	public String getErrorMessage(String errorMessage){
-		return errorMessages.get(errorMessage).getText();
+	public String getErrorMessage(String errorMessage) throws Error {
+        return switch (errorMessage) {
+            case "title" -> weErrorTitle.getText();
+            case "description" -> weErrorDescription.getText();
+            case "tags" -> weErrorTags.getText();
+            case "content" -> weErrorContent.getText();
+            default -> throw new Error();
+        };
 	}
 
 	public void openPage() {

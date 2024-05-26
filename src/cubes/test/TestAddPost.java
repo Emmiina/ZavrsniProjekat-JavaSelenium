@@ -132,7 +132,7 @@ public class TestAddPost extends TestBase {
 		postFormPage.inputContentString("Text inside iframe");
 		postFormPage.clickSave();
 		postListPage.checkSuccessMessage();
-
+		Thread.sleep(2000);
 		assertTrue(postListPage.isPostInList(Constants.postTitle));
 	}
 
