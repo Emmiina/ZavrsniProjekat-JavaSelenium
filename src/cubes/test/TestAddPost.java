@@ -1,13 +1,13 @@
 package cubes.test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 import cubes.constants.Constants;
 import cubes.main.TestBase;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.chrome.ChromeDriver;
 import cubes.webpages.posts.PostFormPage;
 import cubes.webpages.posts.PostListPage;
 
@@ -15,10 +15,10 @@ import cubes.webpages.posts.PostListPage;
 public class TestAddPost extends TestBase {
 
 	PostFormPage postFormPage = new PostFormPage(TestBase.driver, TestBase.wait);
-	PostListPage postListPage = new PostListPage(TestBase.driver, TestBase.wait);;
+	PostListPage postListPage = new PostListPage(TestBase.driver, TestBase.wait);
 
 	@Test
-	public void tc1TestLinkFromMenu() {
+	public void tc01TestLinkFromMenu() {
 		postFormPage.checkMenuLink("Sliders list", "https://testblog.kurs-qa.cubes.edu.rs/admin/sliders");
 		postFormPage.checkMenuLink("Add Slider", "https://testblog.kurs-qa.cubes.edu.rs/admin/sliders/add");
 		postFormPage.checkMenuLink("Post Categories list", "https://testblog.kurs-qa.cubes.edu.rs/admin/post-categories");
@@ -33,51 +33,72 @@ public class TestAddPost extends TestBase {
 	}
 	
 	@Test
-	public void tc2TestNavigationLink() {
+	public void tc02TestNavigationLink() {
 		postFormPage.openPage();
 		postFormPage.checkNavigationLink("Home", Constants.starterPageUrl);
+
 		postFormPage.openPage();
 		postFormPage.checkNavigationLink("Post", Constants.postsPageUrl);
 	}
 	
 	@Test
-	public void tc3TestAddEmptyPost() throws InterruptedException {
-		postFormPage.openPage();
-		postFormPage.inputPostString("");
+	public void tc03TestAddEmptyPost() throws InterruptedException {
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+		postFormPage.inputPostTitleString("");
+		postFormPage.clickSave();
+
+		assertEquals(postFormPage.getTitleInputErrorMessage(),"This field is required.");
+		assertEquals(postFormPage.getDescriptionInputErrorMessage(),"This field is required.");
+	}
+	
+	@Test
+	public void tc04TestAddPostWithShortTitle() throws InterruptedException{
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+		postFormPage.inputPostTitleString("Post1");
 		postFormPage.clickSave();
 		
 		String errorMessage = postFormPage.getErrorMessage("title");
 		
-		assertEquals(errorMessage, "This field is required.");
+		assertEquals("Please enter at least 20 characters.", errorMessage);	
 	}
 	
 	@Test
-	public void tc4TestAddPostWithShortTitle() throws InterruptedException{
-		postFormPage.openPage();
-		postFormPage.inputPostString("Post1");
+	public void tc05TestAddPostWithCorrectTitleAndShortDescription() throws InterruptedException{
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+
+		postFormPage.inputPostTitleString(Constants.postTitle);
+
+		postFormPage.inputDescriptionString("dsdsdasdasd");
+
 		postFormPage.clickSave();
-		
-		String errorMessage = postFormPage.getErrorMessage("title");
-		
-		assertEquals(errorMessage, "Please enter at least 20 characters.");
+		String errorMessage = postFormPage.getErrorMessage("description");
+
+		assertEquals(errorMessage, "Please enter at least 50 characters.");
 	}
-	
-	@Test
-	public void tc5TestAddPostWithCorrectTitleAndShortDescription() throws InterruptedException{
-		postFormPage.openPage();
-		postFormPage.inputPostString("Post1Post1Post1Post1Post1");
+
+ 	@Test
+	public void tc06TestAddPostWithCorrectTitleAndShortDescription() throws InterruptedException{
+ 		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+
+		postFormPage.inputPostTitleString(Constants.postTitle);
 		postFormPage.inputDescriptionString("Test 1");
 		postFormPage.clickSave();
-		
-		String errorMessageDescription = postFormPage.getErrorMessage("description");
-
-		assertEquals(errorMessageDescription, "Please enter at least 50 characters.");
-	}
 	
+		String errorMessage = postFormPage.getErrorMessage("description");
+
+		assertEquals("Please enter at least 50 characters.", errorMessage);
+	}
+
 	@Test
-	public void tc6TestAddPostWithCorrectTitleCorrectDescriptionAndEmptyOthersFields() throws InterruptedException{
-		postFormPage.openPage();
-		postFormPage.inputPostString("Post1Post1Post1Post1Post1");
+		public void tc07TestAddPostWithCorrectTitleCorrectDescriptionAndEmptyOthersFields() throws InterruptedException{
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+
+		postFormPage.inputPostTitleString(Constants.postTitle);
 		postFormPage.inputDescriptionString("test1test1test1test1test1test1test1test1test1test1");
 		postFormPage.clickSave();
 		
@@ -87,24 +108,42 @@ public class TestAddPost extends TestBase {
 	}
 	
 	@Test
-	public void tc7TestAddPostWithCorrectTitleCorrectDescriptionCheckTagsNameAndEmptyOthersFields() throws InterruptedException{
-		postFormPage.openPage();
-		postFormPage.inputPostString("Post1Post1Post1Post1Post1");
+	public void tc08TestAddPostWithCorrectTitleCorrectDescriptionCheckTagsNameAndEmptyOthersFields() throws InterruptedException{
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+
+		postFormPage.inputPostTitleString(Constants.postTitle);
 		postFormPage.inputDescriptionString("test1test1test1test1test1test1test1test1test1test1");
-		postFormPage.clickTags();
+		postFormPage.clickTagString(Constants.tagTest);
+		postFormPage.inputContentString("");
 		postFormPage.clickSave();
-
-		String errorMessageContent = postFormPage.getErrorMessage("content");
-
-		assertEquals(errorMessageContent, "The content field is required.");
+		
+		assertEquals(postFormPage.getContentInputErrorMessage(),"The content field is required.");
 	}
 
 	@Test
-	public void tc8TestCancel() throws InterruptedException {
-		postFormPage.openPage();
-		postFormPage.inputPostString("Post test title");
-		postFormPage.clickCancel();
+	public void tc09TestAddPost() throws InterruptedException{
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+
+		postFormPage.inputPostTitleString(Constants.postTitle);
+		postFormPage.inputDescriptionString(Constants.postDescription);
+		postFormPage.clickTagString(Constants.tagTest);
+		postFormPage.inputContentString("Text inside iframe");
+		postFormPage.clickSave();
+		postListPage.checkSuccessMessage();
 		Thread.sleep(2000);
+		assertTrue(postListPage.isPostInList(Constants.postTitle));
+	}
+
+	@Test
+	public void tc10TestCancel() throws InterruptedException {
+		postListPage.openPage();
+		postListPage.clickOnAddNewPost();
+
+		postFormPage.inputPostTitleString(Constants.postTitle);
+		postFormPage.clickCancel();
+		
 		assertEquals(driver.getCurrentUrl(), Constants.postsPageUrl);
 	}
 }
