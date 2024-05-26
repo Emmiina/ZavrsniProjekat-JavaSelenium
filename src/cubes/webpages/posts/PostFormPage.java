@@ -2,6 +2,7 @@ package cubes.webpages.posts;
 
 import static org.testng.Assert.assertEquals;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -20,6 +21,7 @@ public class PostFormPage {
 	
 	private final WebDriver driver;
 	private final WebDriverWait driverWait;
+	public final HashMap<String, WebElement> errorMessages = new HashMap<>();
 
 	//WebElements
 	@FindBy(name="title")
@@ -42,20 +44,8 @@ public class PostFormPage {
 	private WebElement weErrorDescription;
 	@FindBy(id = "tag_id[]-error")
 	private WebElement weErrorTags;
-	@FindBy(xpath = "//*[@class='invalid-feedback']")
+	@FindBy(xpath = "//div[@class='invalid-feedback']")
 	private WebElement weErrorContent;
-
-	//Error messages
-	@FindBy(id="title-error")
-	private WebElement wePostTitleErrorMessage;
-	@FindBy(id="description-error")
-	private WebElement wePostDescriptionErrorMessage;
-	@FindBy(id = "tag_id[]-error")
-	private WebElement wePostTagsErrorMessage;
-	@FindBy(css = "div.invalid-feedback")
-	private WebElement wePostContentErrorMessage;
-
-
 
 	public PostFormPage(WebDriver driver,WebDriverWait driverWait) {
 		this.driver = driver;
@@ -63,23 +53,35 @@ public class PostFormPage {
 		
 		this.driver.get(Constants.addPostPageUrl);
 		this.driver.manage().window().maximize();
+		setErrorMessages();
 		PageFactory.initElements(driver, this);
+	}
+
+	public void setErrorMessages() {
+		errorMessages.put("title",  weErrorTitle);
+		errorMessages.put("description",  weErrorDescription);
+		errorMessages.put("tags",  weErrorTags);
+		errorMessages.put("content",  weErrorContent);
+	}
+
+	public String getErrorMessage(String errorMessage){
+		return errorMessages.get(errorMessage).getText();
 	}
 
 	public void openPage() {
 		driver.get(Constants.addPostPageUrl);
 	}
-	
-	public void addNewPost(String postTitle) {
-		wePostTitle.sendKeys(postTitle);
-		weButtonSave.click();
-	}
 
-	public String addNewRandomPost() {
+	public String addNewRandomPost() throws InterruptedException {
 		Random random = new Random();
 		String postTitle = Constants.postTitle + random.nextInt(100);
+		driverWait.until(ExpectedConditions.visibilityOf(wePostTitle));
 		wePostTitle.sendKeys(postTitle);
-		((JavascriptExecutor) driver).executeScript("arguments[0].click()", weButtonSave);
+		inputPostTitleString(postTitle);
+		inputDescriptionString(Constants.postDescription);
+		clickTagString(Constants.tagTest);
+		inputContentString("Text inside iframe");
+		clickSave();
 		return postTitle;
 	}
 	
@@ -167,17 +169,6 @@ public class PostFormPage {
 			Thread.sleep(1000);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click()", weButtonCancel);
 		}
-
-	public String getErrorMessage(String field) {
-		WebElement we = switch (field) {
-            case "title" -> wePostTitleErrorMessage;
-            case "description" -> wePostDescriptionErrorMessage;
-            case "tags" -> wePostTagsErrorMessage;
-			case "content" -> wePostContentErrorMessage;
-            default -> throw new IllegalStateException("Unexpected value: " + field);
-        };
-        return we.getText();
-	}
 
 	public String getTitleInputErrorMessage() {
 		return weErrorTitle.getText();

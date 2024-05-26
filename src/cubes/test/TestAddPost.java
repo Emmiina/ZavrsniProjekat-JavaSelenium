@@ -1,6 +1,7 @@
 package cubes.test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 import cubes.constants.Constants;
 import cubes.main.TestBase;
@@ -33,13 +34,10 @@ public class TestAddPost extends TestBase {
 	
 	@Test
 	public void tc02TestNavigationLink() {
-		postListPage.openPage();
-		postListPage.clickOnAddNewPost();
-		postListPage.clickOnAddNewPost();
+		postFormPage.openPage();
 		postFormPage.checkNavigationLink("Home", Constants.starterPageUrl);
 
-		postListPage.openPage();
-		postListPage.clickOnAddNewPost();
+		postFormPage.openPage();
 		postFormPage.checkNavigationLink("Post", Constants.postsPageUrl);
 	}
 	
@@ -133,9 +131,9 @@ public class TestAddPost extends TestBase {
 		postFormPage.clickTagString(Constants.tagTest);
 		postFormPage.inputContentString("Text inside iframe");
 		postFormPage.clickSave();
+		postListPage.checkSuccessMessage();
 
-
-		assertEquals(postListPage.isPostInList(Constants.postTitle), false);
+		assertTrue(postListPage.isPostInList(Constants.postTitle));
 	}
 
 	@Test

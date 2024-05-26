@@ -1,7 +1,5 @@
 package cubes.test;
 
-import static org.testng.Assert.assertEquals;
-
 import java.util.Random;
 
 import cubes.constants.Constants;
@@ -13,12 +11,13 @@ import org.junit.runners.MethodSorters;
 import cubes.webpages.posts.PostFormPage;
 import cubes.webpages.posts.PostListPage;
 
+import static org.testng.Assert.*;
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEditPost extends TestBase {
 
 	PostFormPage postFormPage = new PostFormPage(TestBase.driver, TestBase.wait);
 	PostListPage postListPage = new PostListPage(TestBase.driver, TestBase.wait);
-	private static String postTitle;
 
 	@Test
 	public void tc01TestEditPost() throws InterruptedException {
@@ -36,59 +35,86 @@ public class TestEditPost extends TestBase {
 		postFormPage.inputContentString("Text inside iframe");
 
 		postFormPage.clickSave();
+		postListPage.checkSuccessMessage();
 
-		postListPage.clickOnEditPost(postTitle);
+		postListPage.clickOnSortingButton();
 
-		postFormPage.inputPostTitleString("NewNewNewNewNewNewNewNewNew");
+		Thread.sleep(2000);
+		postListPage.clickOnEditActionButton(postTitle);
+
+		String newTitle = "NewNewNewNewNewNewNewNewNew"  + random.nextInt(1000);
+
+		postFormPage.inputPostTitleString(newTitle);
 
 		postFormPage.clickSave();
+		postListPage.checkSuccessMessage();
 
-		assertEquals(postListPage.isPostInList("NewNewNewNewNewNewNewNewNew"), false);
+        assertFalse(postListPage.isPostInList(postTitle));
+
+		postListPage.clickOnSortingButton();
+		Thread.sleep(1000);
+        assertTrue(postListPage.isPostInList(newTitle));
 	}
 
 	@Test
-	public void tc1TestUpdateEmptyPostTitle() throws InterruptedException {
+	public void tc02TestUpdateEmptyPostTitle() throws InterruptedException {
 		postListPage.clickOnAddNewPost();
 		
-		postTitle = postFormPage.addNewRandomPost();
-		
-		postListPage.clickOnEditPost(postTitle);
+		String postTitle = postFormPage.addNewRandomPost();
+		postListPage.checkSuccessMessage();
+
+		postListPage.clickOnSortingButton();
+
+		Thread.sleep(2000);
+		postListPage.clickOnEditActionButton(postTitle);
 		
 		postFormPage.inputPostTitleString("");
 		
 		postFormPage.clickSave();
-		
-	//	String error = postFormPage.getErrorMessage();
-		
-	//	assertEquals("This field is required.", error);	
+
+		assertEquals(postFormPage.getTitleInputErrorMessage(),"This field is required.");
 	}
 	
 	@Test
-	public void tc2TestUpdatePostWithExistingTitle() throws InterruptedException {
-		postListPage.clickOnEditPost(postTitle);
+	public void tc03TestUpdatePostWithExistingTitle() throws InterruptedException {
+		postListPage.clickOnAddNewPost();
+		String postTitle = postFormPage.addNewRandomPost();
+
+		postListPage.clickOnSortingButton();
+
+		Thread.sleep(2000);
+		postListPage.clickOnEditActionButton(postTitle);
 		
 		postFormPage.inputTags("zvejtidkjauiepmuljnspkbo");
 		
 		postFormPage.clickSave();
-		
-//		String error = postFormPage.getErrorMessage();
-		
-	//	assertEquals("The title has alredy exsist", error);
-		
+		postListPage.checkSuccessMessage();
+
+		postListPage.clickOnSortingButton();
+		Thread.sleep(1000);
+		assertTrue(postListPage.isPostInList(postTitle));
 	}
 	
 	@Test
-	public void tc3TestUpdatePostTitle() throws InterruptedException {
-		
-		postListPage.clickOnEditPost(postTitle);
+	public void tc04TestUpdatePostTitle() throws InterruptedException {
+		postListPage.clickOnAddNewPost();
+		String postTitle = postFormPage.addNewRandomPost();
+		postListPage.checkSuccessMessage();
+
+		postListPage.clickOnSortingButton();
+
+		Thread.sleep(2000);
+		postListPage.clickOnEditActionButton(postTitle);
 		
 		String newPostTitle = "New PosstPosstPosstPosst "+postFormPage.getPostString();
 		
-		postFormPage.inputPostTitleString("newPostTitle");
+		postFormPage.inputPostTitleString(newPostTitle);
 		
 		postFormPage.clickSave();
-		
-		assertEquals(true, postListPage.isPostInList(newPostTitle));
+		postListPage.checkSuccessMessage();
 
+		postListPage.clickOnSortingButton();
+		Thread.sleep(2000);
+		assertTrue(postListPage.isPostInList(newPostTitle));
 	}
 }

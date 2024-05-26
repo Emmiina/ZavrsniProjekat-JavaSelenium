@@ -20,7 +20,7 @@ public class TestBase {
 	public static WebDriver driver;
 	public static WebDriverWait wait;	
 	public static LoginPage loginPage;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		String projectLocation = System.getProperty("user.dir");
